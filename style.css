@@ -1,0 +1,37 @@
+body{
+font-family:Arial;
+max-width:600px;
+margin:auto;
+padding:40px;
+}
+
+#slots{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin:20px 0;
+}
+
+.slot{
+padding:10px;
+border:1px solid black;
+cursor:pointer;
+text-align:center;
+}
+
+.slot.selected{
+background:black;
+color:white;
+}
+
+button{
+padding:10px 20px;
+cursor:pointer;
+}
+
+input{
+display:block;
+margin:10px 0;
+padding:10px;
+width:100%;
+}
