@@ -1,4 +1,4 @@
-const API="https://sweet-violet-d22b.rafciuglb.workers.dev/"
+const API="https://sweet-violet-d22b.rafciuglb.workers.dev"
 
 let selectedSlot=null
 
