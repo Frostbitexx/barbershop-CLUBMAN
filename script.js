@@ -63,7 +63,8 @@ date,
 time:selectedSlot,
 name,
 email,
-phone
+phone,
+service
 })
 })
 
