@@ -1,38 +1,78 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<title>Rezerwacja wizyty</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barber Clubman - Rezerwacja wizyty</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <div class="page-bg"></div>
 
-<h1>Rezerwacja wizyty</h1>
+  <main class="wrapper">
+    <section class="hero">
+      <div class="hero-badge">Rezerwacje online</div>
+      <h1>Umów wizytę w <span>Barber Clubman</span></h1>
+      <p>
+        Wybierz dogodny termin, wpisz swoje dane i gotowe.
+        Bez dzwonienia, bez zgadywania, bez „a może jutro po 17?”.
+      </p>
+    </section>
 
-<label>Data</label>
-<input type="date" id="date">
-<select id="service">
-  <option value="Strzyżenie męskie">Strzyżenie męskie</option>
-  <option value="Broda">Broda</option>
-  <option value="Strzyżenie + broda">Strzyżenie + broda</option>
-</select>
+    <section class="booking-card">
+      <div class="card-header">
+        <div>
+          <h2>Formularz rezerwacji</h2>
+          <p>Wybierz usługę, dzień i godzinę wizyty.</p>
+        </div>
+      </div>
 
-<h2>Dostępne godziny</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label for="service">Usługa</label>
+          <select id="service">
+            <option value="Strzyżenie męskie">Strzyżenie męskie</option>
+            <option value="Broda">Broda</option>
+            <option value="Strzyżenie + broda">Strzyżenie + broda</option>
+          </select>
+        </div>
 
-<div id="slots"></div>
+        <div class="field">
+          <label for="date">Data wizyty</label>
+          <input type="date" id="date" />
+        </div>
 
-<h2>Dane</h2>
+        <div class="field">
+          <label for="name">Imię i nazwisko</label>
+          <input id="name" type="text" placeholder="Np. Jan Kowalski" />
+        </div>
 
-<input id="name" placeholder="Imię i nazwisko">
-<input id="email" placeholder="Email">
-<input id="phone" placeholder="Telefon">
+        <div class="field">
+          <label for="phone">Telefon</label>
+          <input id="phone" type="tel" placeholder="Np. 500 600 700" />
+        </div>
 
-<button id="book">Zarezerwuj</button>
+        <div class="field field-full">
+          <label for="email">Adres e-mail</label>
+          <input id="email" type="email" placeholder="Np. jan@email.com" />
+        </div>
+      </div>
 
-<div id="msg"></div>
+      <div class="slots-section">
+        <div class="section-top">
+          <h3>Dostępne godziny</h3>
+          <span class="section-note">Wybierz jeden termin</span>
+        </div>
 
-<script src="script.js"></script>
+        <div id="slots" class="slots"></div>
+      </div>
 
+      <button id="book" class="book-btn">Potwierdź rezerwację</button>
+
+      <div id="msg" class="message"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
