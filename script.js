@@ -45,7 +45,7 @@ slotsDiv.appendChild(div)
 document.getElementById("book").onclick=async()=>{
 
 const date=dateInput.value
-
+const service = document.getElementById("service").value;
 const name=document.getElementById("name").value
 const email=document.getElementById("email").value
 const phone=document.getElementById("phone").value
