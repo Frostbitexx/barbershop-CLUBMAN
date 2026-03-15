@@ -4,36 +4,61 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barber Clubman - Rezerwacja wizyty</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+
+  </style>
 </head>
 <body>
-  <div class="page-bg"></div>
-
   <main class="wrapper">
     <section class="hero">
       <div class="hero-badge">Rezerwacje online</div>
       <h1>Umów wizytę w <span>Barber Clubman</span></h1>
-      <p>
-        Wybierz barbera, usługę, termin i gotowe.
-      </p>
+      <p>Wybierz barbera, usługę, dzień i godzinę. Reszta to już formalność.</p>
     </section>
 
     <section class="booking-card">
       <div class="card-header">
-        <div>
-          <h2>Formularz rezerwacji</h2>
-          <p>Wybierz barbera, usługę, dzień i godzinę wizyty.</p>
-        </div>
+        <h2>Formularz rezerwacji</h2>
+        <p>Możesz wybrać konkretnego barbera albo opcję „Dowolny barber”, żeby zobaczyć wszystkie dostępne terminy.</p>
       </div>
 
       <div class="form-grid">
-        <div class="field">
-          <label for="barber">Barber</label>
-          <select id="barber">
-            <option value="barber1">Barber 1</option>
-            <option value="barber2">Barber 2</option>
-            <option value="barber3">Barber 3</option>
-          </select>
+        <div class="field field-full">
+          <label>Wybierz barbera</label>
+
+          <div class="barber-options" id="barberOptions">
+            <button type="button" class="barber-card selected" data-barber="any">
+              <span class="barber-avatar any-avatar">+</span>
+              <span class="barber-name">Dowolny barber</span>
+              <span class="barber-role">Pokaż wszystkie wolne terminy</span>
+            </button>
+
+            <button type="button" class="barber-card" data-barber="barber1">
+              <span class="barber-avatar">
+                <img src="images/barber1.jpg" alt="Barber 1" onerror="this.parentElement.textContent='B1'; this.remove();" />
+              </span>
+              <span class="barber-name">Barber 1</span>
+              <span class="barber-role">Nowoczesne cięcia</span>
+            </button>
+
+            <button type="button" class="barber-card" data-barber="barber2">
+              <span class="barber-avatar">
+                <img src="images/barber2.jpg" alt="Barber 2" onerror="this.parentElement.textContent='B2'; this.remove();" />
+              </span>
+              <span class="barber-name">Barber 2</span>
+              <span class="barber-role">Fade / broda</span>
+            </button>
+
+            <button type="button" class="barber-card" data-barber="barber3">
+              <span class="barber-avatar">
+                <img src="images/barber3.jpg" alt="Barber 3" onerror="this.parentElement.textContent='B3'; this.remove();" />
+              </span>
+              <span class="barber-name">Barber 3</span>
+              <span class="barber-role">Klasyczne cięcia</span>
+            </button>
+          </div>
+
+          <input type="hidden" id="barber" value="any" />
         </div>
 
         <div class="field">
