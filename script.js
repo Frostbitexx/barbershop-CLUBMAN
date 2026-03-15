@@ -2,22 +2,39 @@ const API = "https://sweet-violet-d22b.rafciuglb.workers.dev";
 
 let selectedSlot = null;
 
+const barberSelect = document.getElementById("barber");
 const dateInput = document.getElementById("date");
 const slotsDiv = document.getElementById("slots");
 const msg = document.getElementById("msg");
+const bookButton = document.getElementById("book");
 
+barberSelect.addEventListener("change", loadSlots);
 dateInput.addEventListener("change", loadSlots);
 
 async function loadSlots() {
   const date = dateInput.value;
+  const barber = barberSelect.value;
+
+  slotsDiv.innerHTML = "";
+  selectedSlot = null;
+
+  if (!barber) {
+    msg.innerText = "Wybierz barbera.";
+    return;
+  }
 
   if (!date) {
     msg.innerText = "Wybierz datę.";
     return;
   }
 
+  msg.innerText = "Pobieranie terminów...";
+
   try {
-    const res = await fetch(`${API}/slots?date=${encodeURIComponent(date)}`);
+    const res = await fetch(
+      `${API}/slots?date=${encodeURIComponent(date)}&barber=${encodeURIComponent(barber)}`
+    );
+
     const data = await res.json();
 
     if (!res.ok || !data.success) {
@@ -55,7 +72,8 @@ async function loadSlots() {
   }
 }
 
-document.getElementById("book").onclick = async () => {
+bookButton.onclick = async () => {
+  const barber = barberSelect.value;
   const date = dateInput.value;
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
@@ -63,6 +81,11 @@ document.getElementById("book").onclick = async () => {
 
   const serviceElement = document.getElementById("service");
   const service = serviceElement ? serviceElement.value : "Strzyżenie męskie";
+
+  if (!barber) {
+    msg.innerText = "Wybierz barbera.";
+    return;
+  }
 
   if (!date) {
     msg.innerText = "Wybierz datę.";
@@ -79,6 +102,9 @@ document.getElementById("book").onclick = async () => {
     return;
   }
 
+  bookButton.disabled = true;
+  msg.innerText = "Zapisywanie rezerwacji...";
+
   try {
     const res = await fetch(`${API}/book`, {
       method: "POST",
@@ -86,6 +112,7 @@ document.getElementById("book").onclick = async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        barber,
         date,
         time: selectedSlot,
         name,
@@ -102,9 +129,17 @@ document.getElementById("book").onclick = async () => {
     }
 
     msg.innerText = data.message || "Rezerwacja zapisana.";
+
+    selectedSlot = null;
     await loadSlots();
+
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("phone").value = "";
   } catch (err) {
     console.error(err);
     msg.innerText = err.message || "Błąd podczas rezerwacji.";
+  } finally {
+    bookButton.disabled = false;
   }
 };
