@@ -9,6 +9,8 @@ const dateInput = document.getElementById("date");
 const slotsDiv = document.getElementById("slots");
 const msg = document.getElementById("msg");
 const bookButton = document.getElementById("book");
+const bookingLoader = document.getElementById("bookingLoader");
+const bookingLoaderText = document.getElementById("bookingLoaderText");
 
 const today = new Date();
 const yyyy = today.getFullYear();
@@ -30,6 +32,26 @@ barberCards.forEach(card => {
 
 dateInput.addEventListener("change", loadSlots);
 
+function setMessage(text = "", type = "") {
+  msg.innerText = text;
+  msg.classList.remove("success", "error");
+
+  if (type) {
+    msg.classList.add(type);
+  }
+}
+
+function showLoader(text = "Zapisywanie rezerwacji...") {
+  bookingLoaderText.innerText = text;
+  bookingLoader.classList.remove("hidden");
+  bookingLoader.setAttribute("aria-hidden", "false");
+}
+
+function hideLoader() {
+  bookingLoader.classList.add("hidden");
+  bookingLoader.setAttribute("aria-hidden", "true");
+}
+
 async function loadSlots() {
   const date = dateInput.value;
   const barber = barberInput.value || selectedBarber;
@@ -38,16 +60,16 @@ async function loadSlots() {
   selectedSlot = null;
 
   if (!barber) {
-    msg.innerText = "Wybierz barbera.";
+    setMessage("Wybierz barbera.", "error");
     return;
   }
 
   if (!date) {
-    msg.innerText = "Wybierz datę.";
+    setMessage("Wybierz datę.", "error");
     return;
   }
 
-  msg.innerText = "Pobieranie terminów...";
+ setMessage("Pobieranie terminów...");
 
   try {
     const res = await fetch(
@@ -64,10 +86,10 @@ async function loadSlots() {
 
     slotsDiv.innerHTML = "";
     selectedSlot = null;
-    msg.innerText = "";
+    setMessage("");
 
     if (slots.length === 0) {
-      msg.innerText = "Brak wolnych terminów na wybrany dzień.";
+      setMessage("Brak wolnych terminów na wybrany dzień.");
       return;
     }
 
@@ -88,7 +110,7 @@ async function loadSlots() {
   } catch (err) {
     console.error(err);
     slotsDiv.innerHTML = "";
-    msg.innerText = err.message || "Nie udało się pobrać terminów.";
+    setMessage(err.message || "Nie udało się pobrać terminów.", "error");
   }
 }
 
@@ -101,27 +123,28 @@ bookButton.addEventListener("click", async () => {
   const service = document.getElementById("service").value;
 
   if (!barber) {
-    msg.innerText = "Wybierz barbera.";
+    setMessage("Wybierz barbera.", "error");
     return;
   }
 
   if (!date) {
-    msg.innerText = "Wybierz datę.";
+    setMessage("Wybierz datę.", "error");
     return;
   }
 
   if (!selectedSlot) {
-    msg.innerText = "Wybierz godzinę.";
+    setMessage("Wybierz godzinę.", "error");
     return;
   }
 
   if (!name || !email || !phone) {
-    msg.innerText = "Uzupełnij dane klienta.";
+    setMessage("Uzupełnij dane klienta.", "error");
     return;
   }
 
   bookButton.disabled = true;
-  msg.innerText = "Zapisywanie rezerwacji...";
+  bookButton.innerText = "Trwa zapisywanie...";
+  showLoader("Zapisywanie rezerwacji...");
 
   try {
     const res = await fetch(`${API}/book`, {
@@ -146,7 +169,7 @@ bookButton.addEventListener("click", async () => {
       throw new Error(data.message || `Błąd ${res.status}`);
     }
 
-    msg.innerText = data.message || "Rezerwacja zapisana.";
+    setMessage(data.message || "Rezerwacja zapisana.", "success");
 
     document.getElementById("name").value = "";
     document.getElementById("email").value = "";
@@ -156,8 +179,10 @@ bookButton.addEventListener("click", async () => {
     await loadSlots();
   } catch (err) {
     console.error(err);
-    msg.innerText = err.message || "Błąd podczas rezerwacji.";
+    setMessage(err.message || "Błąd podczas rezerwacji.", "error");
   } finally {
+    hideLoader();
     bookButton.disabled = false;
+    bookButton.innerText = "Potwierdź rezerwację";
   }
 });
