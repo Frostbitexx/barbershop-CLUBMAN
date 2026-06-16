@@ -14,7 +14,7 @@
       <p>Wybierz barbera, usługę, dzień i godzinę. Reszta to już formalność.</p>
     </section>
 
-    <section class="booking-card">
+    <section class="booking-card" id="bookingCard">
       <div id="bookingFormView">
       <div class="card-header">
         <h2>Formularz rezerwacji</h2>
@@ -106,6 +106,55 @@
 
       <div id="bookingSuccess" class="booking-success hidden" aria-live="polite"></div>
     </section>
+    <section class="success-card hidden" id="successCard">
+  <div class="success-icon">✓</div>
+
+  <h2>Rezerwacja potwierdzona</h2>
+
+  <p class="success-lead">
+    Twoja wizyta została zapisana. Potwierdzenie wysłaliśmy również na podany adres e-mail.
+  </p>
+
+  <div class="success-details">
+    <div>
+      <span>Barber</span>
+      <strong id="successBarber">-</strong>
+    </div>
+
+    <div>
+      <span>Usługa</span>
+      <strong id="successService">-</strong>
+    </div>
+
+    <div>
+      <span>Data</span>
+      <strong id="successDate">-</strong>
+    </div>
+
+    <div>
+      <span>Godzina</span>
+      <strong id="successTime">-</strong>
+    </div>
+  </div>
+
+  <div class="success-actions">
+    <a id="successCalendarLink" class="success-action primary" href="#" target="_blank" rel="noopener">
+      Dodaj do kalendarza
+    </a>
+
+    <a id="successRescheduleLink" class="success-action" href="#" target="_blank" rel="noopener">
+      Zmień termin
+    </a>
+
+    <a id="successCancelLink" class="success-action danger" href="#" target="_blank" rel="noopener">
+      Odwołaj wizytę
+    </a>
+  </div>
+
+  <button id="backToBooking" class="back-btn" type="button">
+    Wróć do formularza
+  </button>
+</section>
   </main>
 
   <div id="bookingLoader" class="booking-loader hidden" aria-hidden="true">

@@ -13,6 +13,19 @@ const bookingLoader = document.getElementById("bookingLoader");
 const bookingLoaderText = document.getElementById("bookingLoaderText");
 const bookingFormView = document.getElementById("bookingFormView");
 const bookingSuccess = document.getElementById("bookingSuccess");
+const bookingCard = document.getElementById("bookingCard");
+const successCard = document.getElementById("successCard");
+
+const successBarber = document.getElementById("successBarber");
+const successService = document.getElementById("successService");
+const successDate = document.getElementById("successDate");
+const successTime = document.getElementById("successTime");
+
+const successCalendarLink = document.getElementById("successCalendarLink");
+const successRescheduleLink = document.getElementById("successRescheduleLink");
+const successCancelLink = document.getElementById("successCancelLink");
+
+const backToBooking = document.getElementById("backToBooking");
 
 const today = new Date();
 const yyyy = today.getFullYear();
@@ -77,99 +90,23 @@ function formatPolishDate(dateStr) {
   return `${day}.${month}.${year}`;
 }
 
-function showBookingSuccess(data, booking) {
-  const links = data.links || {};
+function showBookingSuccess(data, bookingSummary) {
+  successBarber.innerText = bookingSummary.barberName || "-";
+  successService.innerText = bookingSummary.service || "-";
+  successDate.innerText = formatDateForDisplay(bookingSummary.date);
+  successTime.innerText = bookingSummary.time || "-";
 
-  bookingFormView.classList.add("hidden");
+  successCalendarLink.href = bookingSummary.calendarLink || "#";
+  successRescheduleLink.href = bookingSummary.rescheduleLink || "#";
+  successCancelLink.href = bookingSummary.cancelLink || "#";
 
-  bookingSuccess.innerHTML = `
-    <div class="booking-success-icon">✓</div>
+  bookingCard.classList.add("hidden");
+  successCard.classList.remove("hidden");
 
-    <h2>Rezerwacja potwierdzona</h2>
-
-    <p class="booking-success-lead">
-      Dzięki ${escapeHtml(booking.name)}! Twoja wizyta została zapisana. Potwierdzenie wysłaliśmy też na e-mail.
-    </p>
-
-    <div class="booking-summary-box">
-      <div class="booking-summary-title">Szczegóły rezerwacji</div>
-
-      <div class="booking-summary-row">
-        <span>Barber</span>
-        <strong>${escapeHtml(booking.barberName || "-")}</strong>
-      </div>
-
-      <div class="booking-summary-row">
-        <span>Usługa</span>
-        <strong>${escapeHtml(booking.service || "-")}</strong>
-      </div>
-
-      <div class="booking-summary-row">
-        <span>Data</span>
-        <strong>${escapeHtml(formatPolishDate(booking.date))}</strong>
-      </div>
-
-      <div class="booking-summary-row">
-        <span>Godzina</span>
-        <strong>${escapeHtml(booking.time || "-")}</strong>
-      </div>
-    </div>
-
-    <div class="booking-success-actions">
-      ${links.calendarLink ? `
-        <a class="success-action primary" href="${escapeHtml(links.calendarLink)}" target="_blank" rel="noopener">
-          Dodaj do kalendarza
-        </a>
-      ` : ""}
-
-      ${links.rescheduleLink ? `
-        <a class="success-action" href="${escapeHtml(links.rescheduleLink)}" target="_blank" rel="noopener">
-          Zmień termin
-        </a>
-      ` : ""}
-
-      ${links.cancelLink ? `
-        <a class="success-action danger" href="${escapeHtml(links.cancelLink)}" target="_blank" rel="noopener">
-          Odwołaj wizytę
-        </a>
-      ` : ""}
-    </div>
-
-    ${!links.rescheduleLink || !links.cancelLink ? `
-      <p class="booking-success-note">
-        Link do zmiany lub odwołania wizyty znajdziesz również w mailu potwierdzającym.
-      </p>
-    ` : ""}
-
-    <button type="button" id="backToBooking" class="back-to-booking-btn">
-      Wróć do formularza
-    </button>
-  `;
-
-  bookingSuccess.classList.remove("hidden");
-
-  bookingSuccess.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
   });
-
-  const backButton = document.getElementById("backToBooking");
-
-  if (backButton) {
-    backButton.addEventListener("click", () => {
-      bookingSuccess.classList.add("hidden");
-      bookingSuccess.innerHTML = "";
-      bookingFormView.classList.remove("hidden");
-      setMessage("");
-      selectedSlot = null;
-      loadSlots();
-
-      document.querySelector(".booking-card").scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    });
-  }
 }
 
 async function loadSlots() {
@@ -233,6 +170,44 @@ async function loadSlots() {
     setMessage(err.message || "Nie udało się pobrać terminów.", "error");
   }
 }
+function formatDateForDisplay(date) {
+  if (!date) return "-";
+
+  const [year, month, day] = date.split("-");
+
+  if (!year || !month || !day) return date;
+
+  return `${day}.${month}.${year}`;
+}
+
+function showSuccessScreen(payload, data) {
+  successBarber.innerText = data.barberName || payload.barber || "-";
+  successService.innerText = payload.service || "-";
+  successDate.innerText = formatDateForDisplay(payload.date);
+  successTime.innerText = payload.time || "-";
+
+  successCalendarLink.href = data.calendarLink || "#";
+  successRescheduleLink.href = data.rescheduleLink || "#";
+  successCancelLink.href = data.cancelLink || "#";
+
+  bookingCard.classList.add("hidden");
+  successCard.classList.remove("hidden");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+backToBooking.addEventListener("click", () => {
+  successCard.classList.add("hidden");
+  bookingCard.classList.remove("hidden");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+});
 
 bookButton.addEventListener("click", async () => {
   const barber = barberInput.value || selectedBarber;
@@ -266,22 +241,22 @@ bookButton.addEventListener("click", async () => {
   bookButton.disabled = true;
   bookButton.innerText = "Trwa zapisywanie...";
   showLoader("Zapisywanie rezerwacji...");
-
+const bookingPayload = {
+  barber,
+  date,
+  time: selectedSlot,
+  name,
+  email,
+  phone,
+  service
+};
   try {
     const res = await fetch(`${API}/book`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        barber,
-        date,
-        time: bookedSlot,
-        name,
-        email,
-        phone,
-        service
-      })
+body: JSON.stringify(bookingPayload)
     });
 
     const data = await res.json();
@@ -291,14 +266,17 @@ bookButton.addEventListener("click", async () => {
     }
 
     const bookingSummary = {
-      name,
-      email,
-      phone,
-      service,
-      date,
-      time: bookedSlot,
-      barberName: data.booking?.barberName || data.barberName || "-"
-    };
+  name,
+  email,
+  phone,
+  service,
+  date,
+  time: bookedSlot,
+  barberName: data.booking?.barberName || data.barberName || "-",
+  calendarLink: data.calendarLink || data.booking?.calendarLink || "#",
+  rescheduleLink: data.rescheduleLink || data.booking?.rescheduleLink || "#",
+  cancelLink: data.cancelLink || data.booking?.cancelLink || "#"
+};
 
     document.getElementById("name").value = "";
     document.getElementById("email").value = "";
