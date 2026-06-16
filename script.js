@@ -265,7 +265,7 @@ body: JSON.stringify(bookingPayload)
       throw new Error(data.message || `Błąd ${res.status}`);
     }
 
-    const bookingSummary = {
+const bookingSummary = {
   name,
   email,
   phone,
@@ -273,9 +273,21 @@ body: JSON.stringify(bookingPayload)
   date,
   time: bookedSlot,
   barberName: data.booking?.barberName || data.barberName || "-",
-  calendarLink: data.calendarLink || data.booking?.calendarLink || "#",
-  rescheduleLink: data.rescheduleLink || data.booking?.rescheduleLink || "#",
-  cancelLink: data.cancelLink || data.booking?.cancelLink || "#"
+
+  calendarLink:
+    data.calendarLink ||
+    data.booking?.calendarLink ||
+    "#",
+
+  rescheduleLink:
+    data.rescheduleLink ||
+    data.booking?.rescheduleLink ||
+    "#",
+
+  cancelLink:
+    data.cancelLink ||
+    data.booking?.cancelLink ||
+    "#"
 };
 
     document.getElementById("name").value = "";
