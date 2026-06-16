@@ -274,20 +274,23 @@ const bookingSummary = {
   time: bookedSlot,
   barberName: data.booking?.barberName || data.barberName || "-",
 
-  calendarLink:
-    data.calendarLink ||
-    data.booking?.calendarLink ||
-    "#",
+calendarLink:
+  data.links?.calendarLink ||
+  data.calendarLink ||
+  data.booking?.calendarLink ||
+  "#",
 
-  rescheduleLink:
-    data.rescheduleLink ||
-    data.booking?.rescheduleLink ||
-    "#",
+rescheduleLink:
+  data.links?.rescheduleLink ||
+  data.rescheduleLink ||
+  data.booking?.rescheduleLink ||
+  "#",
 
-  cancelLink:
-    data.cancelLink ||
-    data.booking?.cancelLink ||
-    "#"
+cancelLink:
+  data.links?.cancelLink ||
+  data.cancelLink ||
+  data.booking?.cancelLink ||
+  "#"
 };
 
     document.getElementById("name").value = "";
