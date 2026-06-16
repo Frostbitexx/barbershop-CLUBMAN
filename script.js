@@ -11,6 +11,8 @@ const msg = document.getElementById("msg");
 const bookButton = document.getElementById("book");
 const bookingLoader = document.getElementById("bookingLoader");
 const bookingLoaderText = document.getElementById("bookingLoaderText");
+const bookingFormView = document.getElementById("bookingFormView");
+const bookingSuccess = document.getElementById("bookingSuccess");
 
 const today = new Date();
 const yyyy = today.getFullYear();
@@ -42,14 +44,132 @@ function setMessage(text = "", type = "") {
 }
 
 function showLoader(text = "Zapisywanie rezerwacji...") {
+  if (!bookingLoader || !bookingLoaderText) return;
+
   bookingLoaderText.innerText = text;
   bookingLoader.classList.remove("hidden");
   bookingLoader.setAttribute("aria-hidden", "false");
 }
 
 function hideLoader() {
+  if (!bookingLoader) return;
+
   bookingLoader.classList.add("hidden");
   bookingLoader.setAttribute("aria-hidden", "true");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatPolishDate(dateStr) {
+  const [year, month, day] = String(dateStr).split("-");
+
+  if (!year || !month || !day) {
+    return dateStr;
+  }
+
+  return `${day}.${month}.${year}`;
+}
+
+function showBookingSuccess(data, booking) {
+  const links = data.links || {};
+
+  bookingFormView.classList.add("hidden");
+
+  bookingSuccess.innerHTML = `
+    <div class="booking-success-icon">✓</div>
+
+    <h2>Rezerwacja potwierdzona</h2>
+
+    <p class="booking-success-lead">
+      Dzięki ${escapeHtml(booking.name)}! Twoja wizyta została zapisana. Potwierdzenie wysłaliśmy też na e-mail.
+    </p>
+
+    <div class="booking-summary-box">
+      <div class="booking-summary-title">Szczegóły rezerwacji</div>
+
+      <div class="booking-summary-row">
+        <span>Barber</span>
+        <strong>${escapeHtml(booking.barberName || "-")}</strong>
+      </div>
+
+      <div class="booking-summary-row">
+        <span>Usługa</span>
+        <strong>${escapeHtml(booking.service || "-")}</strong>
+      </div>
+
+      <div class="booking-summary-row">
+        <span>Data</span>
+        <strong>${escapeHtml(formatPolishDate(booking.date))}</strong>
+      </div>
+
+      <div class="booking-summary-row">
+        <span>Godzina</span>
+        <strong>${escapeHtml(booking.time || "-")}</strong>
+      </div>
+    </div>
+
+    <div class="booking-success-actions">
+      ${links.calendarLink ? `
+        <a class="success-action primary" href="${escapeHtml(links.calendarLink)}" target="_blank" rel="noopener">
+          Dodaj do kalendarza
+        </a>
+      ` : ""}
+
+      ${links.rescheduleLink ? `
+        <a class="success-action" href="${escapeHtml(links.rescheduleLink)}" target="_blank" rel="noopener">
+          Zmień termin
+        </a>
+      ` : ""}
+
+      ${links.cancelLink ? `
+        <a class="success-action danger" href="${escapeHtml(links.cancelLink)}" target="_blank" rel="noopener">
+          Odwołaj wizytę
+        </a>
+      ` : ""}
+    </div>
+
+    ${!links.rescheduleLink || !links.cancelLink ? `
+      <p class="booking-success-note">
+        Link do zmiany lub odwołania wizyty znajdziesz również w mailu potwierdzającym.
+      </p>
+    ` : ""}
+
+    <button type="button" id="backToBooking" class="back-to-booking-btn">
+      Wróć do formularza
+    </button>
+  `;
+
+  bookingSuccess.classList.remove("hidden");
+
+  bookingSuccess.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+  const backButton = document.getElementById("backToBooking");
+
+  if (backButton) {
+    backButton.addEventListener("click", () => {
+      bookingSuccess.classList.add("hidden");
+      bookingSuccess.innerHTML = "";
+      bookingFormView.classList.remove("hidden");
+      setMessage("");
+      selectedSlot = null;
+      loadSlots();
+
+      document.querySelector(".booking-card").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+  }
 }
 
 async function loadSlots() {
@@ -69,7 +189,7 @@ async function loadSlots() {
     return;
   }
 
- setMessage("Pobieranie terminów...");
+  setMessage("Pobieranie terminów...");
 
   try {
     const res = await fetch(
@@ -121,6 +241,7 @@ bookButton.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const service = document.getElementById("service").value;
+  const bookedSlot = selectedSlot;
 
   if (!barber) {
     setMessage("Wybierz barbera.", "error");
@@ -132,7 +253,7 @@ bookButton.addEventListener("click", async () => {
     return;
   }
 
-  if (!selectedSlot) {
+  if (!bookedSlot) {
     setMessage("Wybierz godzinę.", "error");
     return;
   }
@@ -155,7 +276,7 @@ bookButton.addEventListener("click", async () => {
       body: JSON.stringify({
         barber,
         date,
-        time: selectedSlot,
+        time: bookedSlot,
         name,
         email,
         phone,
@@ -169,7 +290,15 @@ bookButton.addEventListener("click", async () => {
       throw new Error(data.message || `Błąd ${res.status}`);
     }
 
-    setMessage(data.message || "Rezerwacja zapisana.", "success");
+    const bookingSummary = {
+      name,
+      email,
+      phone,
+      service,
+      date,
+      time: bookedSlot,
+      barberName: data.booking?.barberName || data.barberName || "-"
+    };
 
     document.getElementById("name").value = "";
     document.getElementById("email").value = "";
@@ -177,6 +306,7 @@ bookButton.addEventListener("click", async () => {
 
     selectedSlot = null;
     await loadSlots();
+    showBookingSuccess(data, bookingSummary);
   } catch (err) {
     console.error(err);
     setMessage(err.message || "Błąd podczas rezerwacji.", "error");

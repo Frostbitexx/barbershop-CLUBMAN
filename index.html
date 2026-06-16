@@ -15,6 +15,7 @@
     </section>
 
     <section class="booking-card">
+      <div id="bookingFormView">
       <div class="card-header">
         <h2>Formularz rezerwacji</h2>
         <p>Możesz wybrać konkretnego barbera albo opcję „Dowolny barber”, żeby zobaczyć wszystkie dostępne terminy.</p>
@@ -101,18 +102,18 @@
       <button id="book" class="book-btn">Potwierdź rezerwację</button>
 
       <div id="msg" class="message"></div>
+      </div>
+
+      <div id="bookingSuccess" class="booking-success hidden" aria-live="polite"></div>
     </section>
   </main>
-    <div id="bookingLoader" class="booking-loader hidden" aria-hidden="true">
+
+  <div id="bookingLoader" class="booking-loader hidden" aria-hidden="true">
     <div class="booking-loader-box">
       <div class="booking-spinner"></div>
       <p id="bookingLoaderText">Zapisywanie rezerwacji...</p>
     </div>
   </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
 
   <script src="script.js"></script>
 </body>
